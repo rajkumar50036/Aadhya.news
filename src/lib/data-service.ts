@@ -21,7 +21,74 @@ export interface StoryItem {
   readCount?: number;
 }
 
-// High Quality Live Fallback Data for Vercel Serverless resilience
+export interface BlogPostItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  authorName: string;
+  authorRole: string;
+  authorAvatar?: string;
+  category: string;
+  tags: string[];
+  imageUrl?: string;
+  readTimeMinutes: number;
+  publishedAt: string | Date;
+}
+
+export const FALLBACK_BLOGS: BlogPostItem[] = [
+  {
+    id: 'blog-1',
+    title: 'How Artificial Intelligence is Reshaping Modern Journalism and News Verification',
+    slug: 'ai-reshaping-modern-journalism-news-verification',
+    excerpt: 'An in-depth analysis of automated feed normalization, duplicate clustering algorithms, and natural language executive summarization.',
+    content: `Artificial Intelligence is fundamentally altering how information is gathered, verified, and distributed across global newsrooms.
+
+### The Problem of Information Velocity
+In an era where thousands of RSS feeds, social dispatches, and press releases are published every minute, human editorial teams face unprecedented cognitive overload.
+
+### Automated Deduplication and Multi-Source Verification
+By deploying n-gram similarity scoring and TF-IDF vector embeddings, automated news platforms can evaluate incoming reports against verified official registries (such as PIB, NTA, and NASA) before publishing.
+
+### The Role of Neutral Executive Summaries
+AI models convert dense 2000-word articles into 3 bullet key takeaways, saving readers time while preserving objective factual integrity.`,
+    authorName: 'Dr. Aris Thorne',
+    authorRole: 'Senior AI Research Architect',
+    authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+    category: 'Technology & AI',
+    tags: ['AI', 'Journalism', 'Tech', 'Algorithms'],
+    imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
+    readTimeMinutes: 5,
+    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 12),
+  },
+  {
+    id: 'blog-2',
+    title: 'Strategies for Cracking JEE Main & NEET 2026: Time Management and Exam Prep',
+    slug: 'strategies-cracking-jee-main-neet-2026-exam-prep',
+    excerpt: 'Comprehensive roadmap for engineering and medical aspirants covering mock test schedules, revision strategies, and syllabus tracking.',
+    content: `Preparing for national competitive entrance examinations requires structured time management, consistent practice, and rapid revision techniques.
+
+### 1. Master the Core NCERT Foundation
+Over 80% of direct conceptual questions in NEET and JEE Main build directly upon NCERT concepts. Ensure thorough mastery before attempting complex numerical problems.
+
+### 2. Standardized Mock Test Simulation
+Take full-length 3-hour computer-based mock tests twice a week under actual exam room timing constraints.
+
+### 3. Error Log Analysis
+Maintain a dedicated notebook recording missed questions during mock exams to prevent repeating procedural errors.`,
+    authorName: 'Prof. Rajesh Sharma',
+    authorRole: 'Chief Education Mentor',
+    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    category: 'Education & Careers',
+    tags: ['JEE', 'NEET', 'Education', 'Exams'],
+    imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&auto=format&fit=crop&q=80',
+    readTimeMinutes: 6,
+    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
+  },
+];
+
+// High Quality Live Fallback News Data
 export const FALLBACK_STORIES: StoryItem[] = [
   {
     id: 'story-live-1',
@@ -156,7 +223,6 @@ export async function fetchStoriesSafe(filter: {
     console.warn('Prisma DB query fallback to memory provider:', error);
   }
 
-  // Fallback filtering on memory list if DB is initializing on Vercel
   let result = [...FALLBACK_STORIES];
 
   if (filter.category) {
@@ -217,4 +283,12 @@ export async function fetchStoryBySlugSafe(slug: string): Promise<{
   const related = FALLBACK_STORIES.filter((s) => s.id !== story.id).slice(0, 3);
 
   return { story, related };
+}
+
+export async function fetchBlogsSafe(): Promise<BlogPostItem[]> {
+  return FALLBACK_BLOGS;
+}
+
+export async function fetchBlogBySlugSafe(slug: string): Promise<BlogPostItem | null> {
+  return FALLBACK_BLOGS.find((b) => b.slug === slug) || FALLBACK_BLOGS[0];
 }

@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-4">
             <LogoPlaceholder className="text-white" />
             <p className="text-xs text-slate-400 leading-relaxed">
-              Automated real-time news intelligence platform delivering verified headlines, instant summaries, and multi-source aggregation across global, national, student, and competitive exam updates.
+              Automated real-time news intelligence platform delivering verified headlines, multi-language executive summaries, and editorial blogs.
             </p>
             <div>
               <p className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-1">24/7 Helpline</p>
@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
 
           {/* Col 2: News Sections */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">News Coverage</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">News & Content</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/global" className="hover:text-sky-400 transition-colors">Global News & World</Link>
@@ -35,35 +35,32 @@ export const Footer: React.FC = () => {
                 <Link href="/student" className="hover:text-sky-400 transition-colors">Student & Higher Education</Link>
               </li>
               <li>
-                <Link href="/exams" className="hover:text-sky-400 transition-colors">Competitive Exams & Alerts</Link>
+                <Link href="/exams" className="hover:text-sky-400 transition-colors">Competitive Exams Desk</Link>
+              </li>
+              <li>
+                <Link href="/blogs" className="hover:text-sky-400 font-bold text-indigo-400 transition-colors">Editorial Blogs & Articles</Link>
               </li>
               <li>
                 <Link href="/live" className="hover:text-sky-400 transition-colors">Live News Ticker</Link>
               </li>
-              <li>
-                <Link href="/trending" className="hover:text-sky-400 transition-colors">Trending Topics</Link>
-              </li>
             </ul>
           </div>
 
-          {/* Col 3: Sub-Categories */}
+          {/* Col 3: User Account & Portals */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Categories</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">User & Access</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/global/technology" className="hover:text-sky-400 transition-colors">Technology & AI</Link>
+                <Link href="/login" className="hover:text-sky-400 transition-colors">Sign In to Account</Link>
               </li>
               <li>
-                <Link href="/global/science-space" className="hover:text-sky-400 transition-colors">Science & Space</Link>
+                <Link href="/register" className="hover:text-sky-400 transition-colors">Create Free Account</Link>
               </li>
               <li>
-                <Link href="/india/economy" className="hover:text-sky-400 transition-colors">Economy & Finance</Link>
+                <Link href="/admin" className="text-sky-400 font-bold hover:underline">Admin Portal Access</Link>
               </li>
               <li>
-                <Link href="/india/jobs-careers" className="hover:text-sky-400 transition-colors">Jobs & Careers</Link>
-              </li>
-              <li>
-                <Link href="/global/sports" className="hover:text-sky-400 transition-colors">Sports & Athletics</Link>
+                <Link href="/search" className="hover:text-sky-400 transition-colors">Search Engine</Link>
               </li>
             </ul>
           </div>
@@ -89,9 +86,6 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link href="/accessibility" className="hover:text-sky-400 transition-colors">Accessibility</Link>
-              </li>
-              <li className="pt-2">
-                <Link href="/admin" className="text-sky-400 font-bold hover:underline">Admin Portal Access</Link>
               </li>
             </ul>
           </div>

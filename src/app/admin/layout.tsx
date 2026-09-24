@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Rss, FileText, Settings, Shield, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Rss, FileText, BookOpen, Shield, ArrowLeft } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Admin Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 flex-wrap">
         <Link
           href="/admin"
           className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-sky-50 dark:hover:bg-sky-950/60 flex items-center gap-2"
@@ -45,6 +45,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           <FileText className="w-4 h-4 text-emerald-500" />
           <span>Publish & Edit Stories</span>
+        </Link>
+        <Link
+          href="/admin/blogs"
+          className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-sky-50 dark:hover:bg-sky-950/60 flex items-center gap-2"
+        >
+          <BookOpen className="w-4 h-4 text-indigo-500" />
+          <span>Editorial Blogs</span>
         </Link>
       </div>
 
