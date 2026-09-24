@@ -1,16 +1,12 @@
 import React from 'react';
-import { db } from '@/lib/db';
+import { fetchStoriesSafe } from '@/lib/data-service';
 import { StoryCard, StoryData } from '@/components/StoryCard';
 import { BookOpen } from 'lucide-react';
 
 export const revalidate = 0;
 
 export default async function ExamsPage() {
-  const stories = await db.story.findMany({
-    where: { category: 'exams' },
-    orderBy: { publishedAt: 'desc' },
-    take: 20,
-  });
+  const stories = await fetchStoriesSafe({ category: 'exams', take: 20 });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">

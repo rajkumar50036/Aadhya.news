@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { db } from '@/lib/db';
+import { fetchStoriesSafe } from '@/lib/data-service';
 import { StoryCard, StoryData } from '@/components/StoryCard';
 import { BreakingTicker } from '@/components/BreakingTicker';
 import { ContactDialerButton } from '@/components/ContactDialerButton';
@@ -10,38 +10,25 @@ import { IngestButton } from '@/components/IngestButton';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  let breakingStories: any[] = [];
-  let featuredStories: any[] = [];
-  let latestStories: any[] = [];
-  let globalStories: any[] = [];
-  let indiaStories: any[] = [];
-  let studentStories: any[] = [];
-  let liveStories: any[] = [];
-  let trendingStories: any[] = [];
-
-  try {
-    const results = await Promise.all([
-      db.story.findMany({ where: { isBreaking: true }, orderBy: { publishedAt: 'desc' }, take: 5 }),
-      db.story.findMany({ where: { isFeatured: true }, orderBy: { publishedAt: 'desc' }, take: 2 }),
-      db.story.findMany({ orderBy: { publishedAt: 'desc' }, take: 6 }),
-      db.story.findMany({ where: { category: 'global' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-      db.story.findMany({ where: { category: 'india' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-      db.story.findMany({ where: { category: { in: ['student', 'exams'] } }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-      db.story.findMany({ where: { isLive: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
-      db.story.findMany({ where: { isTrending: true }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-    ]);
-
-    breakingStories = results[0];
-    featuredStories = results[1];
-    latestStories = results[2];
-    globalStories = results[3];
-    indiaStories = results[4];
-    studentStories = results[5];
-    liveStories = results[6];
-    trendingStories = results[7];
-  } catch (error) {
-    console.error('HomePage DB fetch error fallback:', error);
-  }
+  const [
+    breakingStories,
+    featuredStories,
+    latestStories,
+    globalStories,
+    indiaStories,
+    studentStories,
+    liveStories,
+    trendingStories,
+  ] = await Promise.all([
+    fetchStoriesSafe({ isBreaking: true, take: 5 }),
+    fetchStoriesSafe({ isFeatured: true, take: 2 }),
+    fetchStoriesSafe({ take: 6 }),
+    fetchStoriesSafe({ category: 'global', take: 4 }),
+    fetchStoriesSafe({ category: 'india', take: 4 }),
+    fetchStoriesSafe({ category: 'exams', take: 4 }),
+    fetchStoriesSafe({ isLive: true, take: 3 }),
+    fetchStoriesSafe({ isTrending: true, take: 4 }),
+  ]);
 
   const heroStory = featuredStories[0] || latestStories[0];
 
