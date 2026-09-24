@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Radio, Flame, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, Radio, Flame, Moon, Sun, Menu, X, ChevronDown, User } from 'lucide-react';
 import { LogoPlaceholder } from './LogoPlaceholder';
 import { ContactDialerButton } from './ContactDialerButton';
 import { LanguageSelector } from './LanguageSelector';
@@ -95,7 +95,7 @@ export const Navbar: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
           </form>
 
-          {/* Right Actions: Multi-Language Selector, Dark Mode, Dialer Button */}
+          {/* Right Actions: Multi-Language Selector, Dark Mode, Profile Link, Dialer Button */}
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSelector currentLang={language} onLanguageChange={setLanguage} />
 
@@ -108,6 +108,14 @@ export const Navbar: React.FC = () => {
             >
               {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
             </button>
+
+            <Link
+              href="/profile"
+              aria-label="User Account"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <User className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            </Link>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -222,12 +230,6 @@ export const Navbar: React.FC = () => {
           >
             {t('contact')}
           </Link>
-          <Link
-            href="/admin"
-            className="px-3 py-1.5 rounded-md bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs"
-          >
-            {t('admin')}
-          </Link>
         </nav>
       </div>
 
@@ -266,11 +268,11 @@ export const Navbar: React.FC = () => {
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
             <ContactDialerButton className="w-full justify-center" showText={true} />
             <Link
-              href="/admin"
+              href="/profile"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-2 text-center rounded-lg bg-slate-800 text-white font-bold text-xs"
+              className="w-full py-2 text-center rounded-lg bg-sky-600 text-white font-bold text-xs"
             >
-              {t('admin')}
+              My Reader Profile
             </Link>
           </div>
         </div>

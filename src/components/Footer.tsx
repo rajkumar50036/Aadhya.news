@@ -51,16 +51,19 @@ export const Footer: React.FC = () => {
             <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3">User & Access</h4>
             <ul className="space-y-2 text-xs">
               <li>
+                <Link href="/profile" className="hover:text-sky-400 font-bold transition-colors">My Profile & Settings</Link>
+              </li>
+              <li>
                 <Link href="/login" className="hover:text-sky-400 transition-colors">Sign In to Account</Link>
               </li>
               <li>
                 <Link href="/register" className="hover:text-sky-400 transition-colors">Create Free Account</Link>
               </li>
               <li>
-                <Link href="/admin" className="text-sky-400 font-bold hover:underline">Admin Portal Access</Link>
+                <Link href="/bookmarks" className="hover:text-sky-400 transition-colors">Saved Bookmarks</Link>
               </li>
               <li>
-                <Link href="/search" className="hover:text-sky-400 transition-colors">Search Engine</Link>
+                <Link href="/reading-history" className="hover:text-sky-400 transition-colors">Reading History</Link>
               </li>
             </ul>
           </div>
