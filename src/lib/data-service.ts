@@ -1,5 +1,3 @@
-import { db } from './db';
-
 export interface StoryItem {
   id: string;
   title: string;
@@ -88,7 +86,6 @@ Maintain a dedicated notebook recording missed questions during mock exams to pr
   },
 ];
 
-// High Quality Live Fallback News Data
 export const FALLBACK_STORIES: StoryItem[] = [
   {
     id: 'story-live-1',
@@ -194,6 +191,7 @@ export async function fetchStoriesSafe(filter: {
   search?: string;
 }): Promise<StoryItem[]> {
   try {
+    const { db } = await import('./db');
     const where: any = {};
     if (filter.category) where.category = filter.category;
     if (filter.subCategory) where.subCategory = filter.subCategory;
@@ -220,7 +218,7 @@ export async function fetchStoriesSafe(filter: {
       return stories as unknown as StoryItem[];
     }
   } catch (error) {
-    console.warn('Prisma DB query fallback to memory provider:', error);
+    // Graceful fallback for Vercel serverless cold starts
   }
 
   let result = [...FALLBACK_STORIES];
@@ -262,6 +260,7 @@ export async function fetchStoryBySlugSafe(slug: string): Promise<{
   related: StoryItem[];
 }> {
   try {
+    const { db } = await import('./db');
     const story = await db.story.findUnique({
       where: { slug },
       include: { sources: true, liveUpdates: true },
@@ -276,7 +275,7 @@ export async function fetchStoryBySlugSafe(slug: string): Promise<{
       return { story: story as unknown as StoryItem, related: related as unknown as StoryItem[] };
     }
   } catch (e) {
-    console.warn('Prisma DB slug query fallback:', e);
+    // Fallback
   }
 
   const story = FALLBACK_STORIES.find((s) => s.slug === slug) || FALLBACK_STORIES[0];
