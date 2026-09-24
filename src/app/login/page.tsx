@@ -3,34 +3,45 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { LogoPlaceholder } from '@/components/LogoPlaceholder';
-import { useLanguage } from '@/context/LanguageContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to sign in.');
+      }
+
       router.push('/');
-    }, 1000);
+      router.refresh();
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Invalid email or password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
-    setGoogleLoading(true);
-    setTimeout(() => {
-      setGoogleLoading(false);
-      localStorage.setItem('user_auth', JSON.stringify({ email: 'user@gmail.com', name: 'Google User', provider: 'google' }));
-      router.push('/');
-    }, 1200);
+    window.location.href = '/api/auth/google';
   };
 
   return (
@@ -46,10 +57,16 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-xs flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
         {/* Google (Gmail) One-Tap Login Button */}
         <button
           onClick={handleGoogleSignIn}
-          disabled={googleLoading}
           type="button"
           className="w-full py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-3 transition-all shadow-sm active:scale-95"
         >
@@ -72,7 +89,7 @@ export default function LoginPage() {
               d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.7 1.29 6.58l3.99 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
             />
           </svg>
-          <span>{googleLoading ? 'Connecting to Gmail...' : 'Continue with Google (Gmail)'}</span>
+          <span>Continue with Google (Gmail)</span>
         </button>
 
         <div className="relative flex items-center justify-center">

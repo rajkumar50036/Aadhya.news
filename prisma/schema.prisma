@@ -8,6 +8,21 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
+model User {
+  id                String           @id @default(cuid())
+  name              String
+  email             String           @unique
+  passwordHash      String?
+  googleId          String?          @unique
+  avatarUrl         String?
+  role              String           @default("USER") // USER, ADMIN
+  preferredLanguage String           @default("en")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  bookmarks         Bookmark[]
+  readingHistory    ReadingHistory[]
+}
+
 model Feed {
   id                   String        @id @default(cuid())
   name                 String
@@ -25,31 +40,114 @@ model Feed {
 }
 
 model Story {
-  id                 String        @id @default(cuid())
+  id                 String               @id @default(cuid())
   title              String
-  slug               String        @unique
+  slug               String               @unique
   rawTitle           String?
   summary            String
   content            String
   sourceName         String
   sourceUrl          String
   imageUrl           String?
-  category           String        // global, india, student, exams, live, trending
-  subCategory        String?       // world, usa, politics, economy, education, etc.
-  isBreaking         Boolean       @default(false)
-  isFeatured         Boolean       @default(false)
-  isLive             Boolean       @default(false)
-  isTrending         Boolean       @default(false)
-  verificationStatus String        @default("HIGH_CONFIDENCE") // VERIFIED_OFFICIAL, HIGH_CONFIDENCE, MULTIPLE_SOURCES, UNVERIFIED_SINGLE_SOURCE
-  verificationScore  Float         @default(0.85)
+  category           String               // global, india, student, exams, live, trending
+  subCategory        String?              // world, usa, politics, economy, education, etc.
+  isBreaking         Boolean              @default(false)
+  isFeatured         Boolean              @default(false)
+  isLive             Boolean              @default(false)
+  isTrending         Boolean              @default(false)
+  isAiGenerated      Boolean              @default(false)
+  status             String               @default("PUBLISHED") // DRAFT, PUBLISHED
+  verificationStatus String               @default("HIGH_CONFIDENCE") // VERIFIED_OFFICIAL, HIGH_CONFIDENCE, MULTIPLE_SOURCES, UNVERIFIED_SINGLE_SOURCE
+  verificationScore  Float                @default(0.85)
   clusterId          String?
-  readCount          Int           @default(0)
-  isDemoData         Boolean       @default(false)
-  publishedAt        DateTime      @default(now())
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  readCount          Int                  @default(0)
+  isDemoData         Boolean              @default(false)
+  publishedAt        DateTime             @default(now())
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
   sources            StorySource[]
   liveUpdates        LiveUpdate[]
+  translations       ArticleTranslation[]
+  bookmarks          Bookmark[]
+  readingHistory     ReadingHistory[]
+}
+
+model ArticleTranslation {
+  id             String   @id @default(cuid())
+  articleId      String
+  article        Story    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  languageCode   String   // en, hi, te, ta, kn, ml, mr, bn, gu, ur
+  title          String
+  subtitle       String?
+  excerpt        String?
+  content        String
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([articleId, languageCode])
+}
+
+model Blog {
+  id              String            @id @default(cuid())
+  title           String
+  slug            String            @unique
+  excerpt         String
+  content         String
+  authorName      String            @default("Editorial Desk")
+  authorRole      String            @default("Senior Editor")
+  authorAvatar    String?
+  category        String            @default("General")
+  tags            String            @default("news,blog")
+  imageUrl        String?
+  readTimeMinutes Int               @default(5)
+  isAiGenerated   Boolean           @default(false)
+  status          String            @default("PUBLISHED") // DRAFT, PUBLISHED
+  publishedAt     DateTime          @default(now())
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  translations    BlogTranslation[]
+  bookmarks       Bookmark[]
+  readingHistory  ReadingHistory[]
+}
+
+model BlogTranslation {
+  id             String   @id @default(cuid())
+  blogId         String
+  blog           Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  languageCode   String   // en, hi, te, ta, kn, ml, mr, bn, gu, ur
+  title          String
+  excerpt        String
+  content        String
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([blogId, languageCode])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String?
+  article   Story?   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  blogId    String?
+  blog      Blog?    @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ReadingHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String?
+  article   Story?   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  blogId    String?
+  blog      Blog?    @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime @default(now())
 }
 
 model StorySource {

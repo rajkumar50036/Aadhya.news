@@ -17,6 +17,13 @@ export interface StoryItem {
   verificationScore?: number;
   publishedAt: string | Date;
   readCount?: number;
+  translations?: Array<{
+    languageCode: string;
+    title: string;
+    summary?: string;
+    excerpt?: string;
+    content: string;
+  }>;
 }
 
 export interface BlogPostItem {
@@ -33,6 +40,12 @@ export interface BlogPostItem {
   imageUrl?: string;
   readTimeMinutes: number;
   publishedAt: string | Date;
+  translations?: Array<{
+    languageCode: string;
+    title: string;
+    excerpt: string;
+    content: string;
+  }>;
 }
 
 export const FALLBACK_BLOGS: BlogPostItem[] = [
@@ -189,6 +202,7 @@ export async function fetchStoriesSafe(filter: {
   isLive?: boolean;
   take?: number;
   search?: string;
+  language?: string;
 }): Promise<StoryItem[]> {
   try {
     const { db } = await import('./db');
@@ -210,12 +224,26 @@ export async function fetchStoriesSafe(filter: {
 
     const stories = await db.story.findMany({
       where,
+      include: {
+        translations: filter.language && filter.language !== 'en' ? {
+          where: { languageCode: filter.language },
+        } : false,
+      },
       orderBy: { publishedAt: 'desc' },
       take: filter.take || 20,
     });
 
     if (stories && stories.length > 0) {
-      return stories as unknown as StoryItem[];
+      const mapped = stories.map((s: any) => {
+        const tr = s.translations && s.translations[0];
+        return {
+          ...s,
+          title: tr?.title || s.title,
+          summary: tr?.excerpt || tr?.summary || s.summary,
+          content: tr?.content || s.content,
+        };
+      });
+      return mapped as unknown as StoryItem[];
     }
   } catch (error) {
     // Graceful fallback for Vercel serverless cold starts
@@ -255,7 +283,10 @@ export async function fetchStoriesSafe(filter: {
   return result;
 }
 
-export async function fetchStoryBySlugSafe(slug: string): Promise<{
+export async function fetchStoryBySlugSafe(
+  slug: string,
+  language: string = 'en'
+): Promise<{
   story: StoryItem | null;
   related: StoryItem[];
 }> {
@@ -263,16 +294,32 @@ export async function fetchStoryBySlugSafe(slug: string): Promise<{
     const { db } = await import('./db');
     const story = await db.story.findUnique({
       where: { slug },
-      include: { sources: true, liveUpdates: true },
+      include: {
+        sources: true,
+        liveUpdates: true,
+        translations: language !== 'en' ? { where: { languageCode: language } } : false,
+      },
     });
 
     if (story) {
+      const tr = (story as any).translations && (story as any).translations[0];
+      const storyData = {
+        ...story,
+        title: tr?.title || story.title,
+        summary: tr?.excerpt || tr?.summary || story.summary,
+        content: tr?.content || story.content,
+      };
+
       const related = await db.story.findMany({
         where: { category: story.category, id: { not: story.id } },
         take: 3,
         orderBy: { publishedAt: 'desc' },
       });
-      return { story: story as unknown as StoryItem, related: related as unknown as StoryItem[] };
+
+      return {
+        story: storyData as unknown as StoryItem,
+        related: related as unknown as StoryItem[],
+      };
     }
   } catch (e) {
     // Fallback
@@ -284,10 +331,81 @@ export async function fetchStoryBySlugSafe(slug: string): Promise<{
   return { story, related };
 }
 
-export async function fetchBlogsSafe(): Promise<BlogPostItem[]> {
+export async function fetchBlogsSafe(language: string = 'en'): Promise<BlogPostItem[]> {
+  try {
+    const { db } = await import('./db');
+    const blogs = await db.blog.findMany({
+      where: { status: 'PUBLISHED' },
+      include: {
+        translations: language !== 'en' ? { where: { languageCode: language } } : false,
+      },
+      orderBy: { publishedAt: 'desc' },
+    });
+
+    if (blogs && blogs.length > 0) {
+      const mapped = blogs.map((b: any) => {
+        const tr = b.translations && b.translations[0];
+        const tagsParsed = typeof b.tags === 'string' ? JSON.parse(b.tags) : b.tags;
+        return {
+          id: b.id,
+          title: tr?.title || b.title,
+          slug: b.slug,
+          excerpt: tr?.excerpt || b.excerpt,
+          content: tr?.content || b.content,
+          authorName: b.authorName || 'Editorial Team',
+          authorRole: b.authorRole || 'News Columnist',
+          authorAvatar: b.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+          category: b.category,
+          tags: Array.isArray(tagsParsed) ? tagsParsed : ['Editorial'],
+          imageUrl: b.imageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
+          readTimeMinutes: b.readTimeMinutes || 5,
+          publishedAt: b.publishedAt,
+        };
+      });
+      return mapped as unknown as BlogPostItem[];
+    }
+  } catch (error) {
+    // Fallback
+  }
+
   return FALLBACK_BLOGS;
 }
 
-export async function fetchBlogBySlugSafe(slug: string): Promise<BlogPostItem | null> {
+export async function fetchBlogBySlugSafe(
+  slug: string,
+  language: string = 'en'
+): Promise<BlogPostItem | null> {
+  try {
+    const { db } = await import('./db');
+    const blog = await db.blog.findUnique({
+      where: { slug },
+      include: {
+        translations: language !== 'en' ? { where: { languageCode: language } } : false,
+      },
+    });
+
+    if (blog) {
+      const tr = (blog as any).translations && (blog as any).translations[0];
+      const tagsParsed = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
+      return {
+        id: blog.id,
+        title: tr?.title || blog.title,
+        slug: blog.slug,
+        excerpt: tr?.excerpt || blog.excerpt,
+        content: tr?.content || blog.content,
+        authorName: blog.authorName || 'Editorial Team',
+        authorRole: blog.authorRole || 'News Columnist',
+        authorAvatar: blog.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+        category: blog.category,
+        tags: Array.isArray(tagsParsed) ? tagsParsed : ['Editorial'],
+        imageUrl: blog.imageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
+        readTimeMinutes: blog.readTimeMinutes || 5,
+        publishedAt: blog.publishedAt,
+      } as unknown as BlogPostItem;
+    }
+  } catch (error) {
+    // Fallback
+  }
+
   return FALLBACK_BLOGS.find((b) => b.slug === slug) || FALLBACK_BLOGS[0];
 }
