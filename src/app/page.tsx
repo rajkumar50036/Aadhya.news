@@ -4,7 +4,7 @@ import { fetchStoriesSafe } from '@/lib/data-service';
 import { StoryCard, StoryData } from '@/components/StoryCard';
 import { BreakingTicker } from '@/components/BreakingTicker';
 import { ContactDialerButton } from '@/components/ContactDialerButton';
-import { Flame, Radio, Zap, Globe, Flag, GraduationCap, ArrowRight } from 'lucide-react';
+import { Flame, Radio, Zap, Globe, Flag, GraduationCap, ArrowRight, UserCheck, Shield } from 'lucide-react';
 import { IngestButton } from '@/components/IngestButton';
 
 export const revalidate = 0;
@@ -37,21 +37,56 @@ export default async function HomePage() {
       {/* Real-time Breaking News Ticker */}
       <BreakingTicker breakingStories={breakingStories as StoryData[]} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Top Control Bar: Contact Call & Manual Ingestion Trigger */}
-        <div className="bg-sky-900 text-white rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-sky-800">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-300 uppercase tracking-widest bg-sky-950/80 px-2.5 py-1 rounded-full border border-sky-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* User Welcome & Gmail Quick Action Banner on Landing Page */}
+        <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-sky-800/60 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 font-bold text-xs border border-sky-500/30">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
-              Automated AI Pipeline Active
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight">Real-Time News Stream & Helpline</h2>
-            <p className="text-xs sm:text-sm text-sky-200">
-              News is fetched from RSS/Atom/Official APIs, verified by AI, and broadcast in real time.
+              Automated AI Pipeline & Multi-Language Active
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+              Personalized Real-Time News Stream
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              Get instant verified news, multi-language translation (हिंदी, తెలుగు, தமிழ், English), and AI executive summaries customized for your preferences.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            {/* Quick Gmail Login Shortcut */}
+            <Link
+              href="/login"
+              className="px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-slate-900 hover:bg-slate-100 transition-colors shadow-lg flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.29v3.15C3.26 21.3 7.35 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.29C.47 8.21 0 10.05 0 12s.47 3.79 1.29 5.42l3.99-3.15z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.7 1.29 6.58l3.99 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                />
+              </svg>
+              <span>Sign In with Gmail</span>
+            </Link>
+
+            <Link
+              href="/register"
+              className="px-4 py-2.5 rounded-xl font-bold text-xs bg-sky-600 hover:bg-sky-500 text-white transition-colors"
+            >
+              Register Free
+            </Link>
+
             <IngestButton />
             <ContactDialerButton />
           </div>
