@@ -3,14 +3,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Radio, Flame, ShieldAlert, PhoneCall, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, Radio, Flame, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
 import { LogoPlaceholder } from './LogoPlaceholder';
 import { ContactDialerButton } from './ContactDialerButton';
-import { CONFIG } from '@/lib/config';
+import { LanguageSelector } from './LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { language, setLanguage, t } = useLanguage();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,13 +37,13 @@ export const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Global', href: '/global', hasDropdown: 'global' },
-    { name: 'India', href: '/india', hasDropdown: 'india' },
-    { name: 'Student', href: '/student' },
-    { name: 'Exams', href: '/exams' },
-    { name: 'Live', href: '/live', icon: Radio, isLive: true },
-    { name: 'Trending', href: '/trending', icon: Flame },
+    { name: t('home'), href: '/' },
+    { name: t('global'), href: '/global', hasDropdown: 'global' },
+    { name: t('india'), href: '/india', hasDropdown: 'india' },
+    { name: t('student'), href: '/student' },
+    { name: t('exams'), href: '/exams' },
+    { name: t('live'), href: '/live', icon: Radio, isLive: true },
+    { name: t('trending'), href: '/trending', icon: Flame },
   ];
 
   const globalSubRoutes = [
@@ -74,7 +77,7 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Header Row */}
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-16 gap-3">
           {/* Left: Logo & Brand Placeholder */}
           <Link href="/" className="shrink-0 flex items-center">
             <LogoPlaceholder />
@@ -84,7 +87,7 @@ export const Navbar: React.FC = () => {
           <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md relative">
             <input
               type="text"
-              placeholder="Search news, topics, exams, or keywords..."
+              placeholder={`${t('search')}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
@@ -92,8 +95,10 @@ export const Navbar: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
           </form>
 
-          {/* Right Actions: Dark Mode, Dialer Button, Mobile Toggle */}
+          {/* Right Actions: Multi-Language Selector, Dark Mode, Dialer Button */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector currentLang={language} onLanguageChange={setLanguage} />
+
             <ContactDialerButton className="hidden sm:inline-flex text-xs px-3 py-1.5" showText={true} />
 
             <button
@@ -215,13 +220,13 @@ export const Navbar: React.FC = () => {
             href="/contact"
             className="ml-auto px-3 py-1.5 rounded-md text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            Contact
+            {t('contact')}
           </Link>
           <Link
             href="/admin"
             className="px-3 py-1.5 rounded-md bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs"
           >
-            Admin Portal
+            {t('admin')}
           </Link>
         </nav>
       </div>
@@ -229,10 +234,15 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-4 space-y-3 animate-in slide-in-from-top duration-200">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+            <span className="text-xs font-bold text-slate-400 uppercase">Select Language</span>
+            <LanguageSelector currentLang={language} onLanguageChange={setLanguage} />
+          </div>
+
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
               type="text"
-              placeholder="Search news..."
+              placeholder={`${t('search')}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700"
@@ -260,7 +270,7 @@ export const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="w-full py-2 text-center rounded-lg bg-slate-800 text-white font-bold text-xs"
             >
-              Admin Dashboard
+              {t('admin')}
             </Link>
           </div>
         </div>

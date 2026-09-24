@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Clock, ExternalLink, Flame, Radio } from 'lucide-react';
 import { VerificationBadge } from './VerificationBadge';
+import { useLanguage } from '@/context/LanguageContext';
 
 export interface StoryData {
   id: string;
@@ -24,6 +27,7 @@ export interface StoryData {
 }
 
 export const StoryCard: React.FC<{ story: StoryData; compact?: boolean }> = ({ story, compact = false }) => {
+  const { t } = useLanguage();
   const timeAgo = formatTimeAgo(new Date(story.publishedAt));
 
   return (
@@ -48,7 +52,7 @@ export const StoryCard: React.FC<{ story: StoryData; compact?: boolean }> = ({ s
           <div className="flex items-center gap-1.5 flex-wrap">
             {story.isBreaking && (
               <span className="px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider bg-red-600 text-white shadow-sm flex items-center gap-1 animate-pulse">
-                BREAKING
+                {t('breakingNews')}
               </span>
             )}
             {story.isLive && (
@@ -58,7 +62,7 @@ export const StoryCard: React.FC<{ story: StoryData; compact?: boolean }> = ({ s
             )}
             {story.isTrending && !story.isBreaking && (
               <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-amber-500 text-white shadow-sm flex items-center gap-1">
-                <Flame className="w-3 h-3" /> TRENDING
+                <Flame className="w-3 h-3" /> {t('trending')}
               </span>
             )}
           </div>
@@ -108,7 +112,7 @@ export const StoryCard: React.FC<{ story: StoryData; compact?: boolean }> = ({ s
             href={`/story/${story.slug}`}
             className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-400 font-semibold hover:underline"
           >
-            Read Story <ExternalLink className="w-3 h-3" />
+            {t('readStory')} <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
       </div>
