@@ -8,12 +8,14 @@ export async function GET() {
   const stream = new ReadableStream({
     start(controller) {
       const sendEvent = (eventData: any) => {
-        const payload = `data: ${JSON.stringify(eventData)}\n\n`;
-        controller.enqueue(encoder.encode(payload));
+        try {
+          const payload = `data: ${JSON.stringify(eventData)}\n\n`;
+          controller.enqueue(encoder.encode(payload));
+        } catch (e) {}
       };
 
       // Initial ping
-      sendEvent({ type: 'connected', message: 'Real-time news stream active' });
+      sendEvent({ type: 'connected', message: 'Ultra-fast real-time news stream active' });
 
       // Event listener
       const handler = (data: any) => {
@@ -22,14 +24,18 @@ export async function GET() {
 
       newsEvents.on('event', handler);
 
-      // Keepalive interval every 20 seconds
-      const keepalive = setInterval(() => {
-        sendEvent({ type: 'ping', timestamp: new Date().toISOString() });
-      }, 20000);
+      // Continuous 1-second ticker heartbeat interval for real-time live clock & stream sync
+      const heartbeat = setInterval(() => {
+        sendEvent({
+          type: 'tick',
+          timestamp: new Date().toISOString(),
+          timeString: new Date().toLocaleTimeString(),
+        });
+      }, 1000);
 
       // Clean up when client disconnects
       return () => {
-        clearInterval(keepalive);
+        clearInterval(heartbeat);
         newsEvents.off('event', handler);
       };
     },

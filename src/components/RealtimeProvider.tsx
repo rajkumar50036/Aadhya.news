@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Radio, X, Zap } from 'lucide-react';
+import { Radio, X, Zap, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 interface ToastAlert {
@@ -13,6 +13,7 @@ interface ToastAlert {
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toast, setToast] = useState<ToastAlert | null>(null);
+  const [liveTimeString, setLiveTimeString] = useState<string>('');
 
   useEffect(() => {
     let eventSource: EventSource | null = null;
@@ -23,6 +24,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       eventSource.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
+
+          if (payload.type === 'tick') {
+            setLiveTimeString(payload.timeString);
+          }
+
           if (payload.type === 'story:published') {
             setToast({
               id: payload.data.id,
@@ -31,17 +37,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               category: payload.data.category,
             });
 
-            // Auto dismiss after 7 seconds
             setTimeout(() => {
               setToast(null);
-            }, 7000);
+            }, 6000);
           }
-        } catch (e) {
-          // parse error ignorable
-        }
+        } catch (e) {}
       };
     } catch (e) {
-      console.warn('Realtime SSE connection fallback enabled');
+      console.warn('Realtime SSE fallback active');
     }
 
     return () => {
@@ -51,6 +54,14 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   return (
     <>
+      {/* Live Stream Indicator Badge in Header Corner */}
+      {liveTimeString && (
+        <div className="fixed top-2 right-4 z-50 pointer-events-none hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 text-white border border-slate-700 text-[10px] font-mono shadow-md backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+          <span>LIVE STREAM {liveTimeString}</span>
+        </div>
+      )}
+
       {children}
 
       {/* Realtime Toast Alert Popup */}
