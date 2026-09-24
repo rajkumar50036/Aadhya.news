@@ -10,25 +10,38 @@ import { IngestButton } from '@/components/IngestButton';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [
-    breakingStories,
-    featuredStories,
-    latestStories,
-    globalStories,
-    indiaStories,
-    studentStories,
-    liveStories,
-    trendingStories,
-  ] = await Promise.all([
-    db.story.findMany({ where: { isBreaking: true }, orderBy: { publishedAt: 'desc' }, take: 5 }),
-    db.story.findMany({ where: { isFeatured: true }, orderBy: { publishedAt: 'desc' }, take: 2 }),
-    db.story.findMany({ orderBy: { publishedAt: 'desc' }, take: 6 }),
-    db.story.findMany({ where: { category: 'global' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-    db.story.findMany({ where: { category: 'india' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-    db.story.findMany({ where: { category: { in: ['student', 'exams'] } }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-    db.story.findMany({ where: { isLive: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
-    db.story.findMany({ where: { isTrending: true }, orderBy: { publishedAt: 'desc' }, take: 4 }),
-  ]);
+  let breakingStories: any[] = [];
+  let featuredStories: any[] = [];
+  let latestStories: any[] = [];
+  let globalStories: any[] = [];
+  let indiaStories: any[] = [];
+  let studentStories: any[] = [];
+  let liveStories: any[] = [];
+  let trendingStories: any[] = [];
+
+  try {
+    const results = await Promise.all([
+      db.story.findMany({ where: { isBreaking: true }, orderBy: { publishedAt: 'desc' }, take: 5 }),
+      db.story.findMany({ where: { isFeatured: true }, orderBy: { publishedAt: 'desc' }, take: 2 }),
+      db.story.findMany({ orderBy: { publishedAt: 'desc' }, take: 6 }),
+      db.story.findMany({ where: { category: 'global' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
+      db.story.findMany({ where: { category: 'india' }, orderBy: { publishedAt: 'desc' }, take: 4 }),
+      db.story.findMany({ where: { category: { in: ['student', 'exams'] } }, orderBy: { publishedAt: 'desc' }, take: 4 }),
+      db.story.findMany({ where: { isLive: true }, orderBy: { publishedAt: 'desc' }, take: 3 }),
+      db.story.findMany({ where: { isTrending: true }, orderBy: { publishedAt: 'desc' }, take: 4 }),
+    ]);
+
+    breakingStories = results[0];
+    featuredStories = results[1];
+    latestStories = results[2];
+    globalStories = results[3];
+    indiaStories = results[4];
+    studentStories = results[5];
+    liveStories = results[6];
+    trendingStories = results[7];
+  } catch (error) {
+    console.error('HomePage DB fetch error fallback:', error);
+  }
 
   const heroStory = featuredStories[0] || latestStories[0];
 
@@ -85,7 +98,7 @@ export default async function HomePage() {
 
                 {heroStory.summary && (
                   <div className="text-sm text-slate-200 line-clamp-3 space-y-1 bg-slate-900/60 backdrop-blur-md p-3 rounded-xl border border-slate-800">
-                    {heroStory.summary.split('\n').map((bullet, idx) => (
+                    {heroStory.summary.split('\n').map((bullet: string, idx: number) => (
                       <p key={idx}>{bullet}</p>
                     ))}
                   </div>
@@ -118,7 +131,7 @@ export default async function HomePage() {
               </div>
 
               <div className="space-y-3">
-                {liveStories.map((story) => (
+                {liveStories.map((story: any) => (
                   <div
                     key={story.id}
                     className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 hover:border-sky-500/50 transition-colors"
@@ -150,7 +163,7 @@ export default async function HomePage() {
               </div>
 
               <div className="space-y-2">
-                {trendingStories.map((story, idx) => (
+                {trendingStories.map((story: any, idx: number) => (
                   <Link
                     key={story.id}
                     href={`/story/${story.slug}`}
@@ -182,7 +195,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestStories.map((story) => (
+            {latestStories.map((story: any) => (
               <StoryCard key={story.id} story={story as StoryData} />
             ))}
           </div>
@@ -201,7 +214,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {globalStories.map((story) => (
+            {globalStories.map((story: any) => (
               <StoryCard key={story.id} story={story as StoryData} compact={true} />
             ))}
           </div>
@@ -220,7 +233,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {indiaStories.map((story) => (
+            {indiaStories.map((story: any) => (
               <StoryCard key={story.id} story={story as StoryData} compact={true} />
             ))}
           </div>
@@ -254,7 +267,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {studentStories.map((story) => (
+            {studentStories.map((story: any) => (
               <div
                 key={story.id}
                 className="bg-slate-900/80 border border-indigo-500/20 rounded-xl p-4 space-y-3 hover:border-indigo-400 transition-colors"
