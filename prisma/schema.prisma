@@ -1,0 +1,80 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Feed {
+  id                   String        @id @default(cuid())
+  name                 String
+  url                  String        @unique
+  category             String        // global, india, student, exams, etc.
+  subCategory          String?       // world, usa, politics, education, etc.
+  sourceType           String        @default("RSS") // RSS, ATOM, API, GOVERNMENT_PORTAL, UNIVERSITY
+  trustScore           Float         @default(0.9)
+  isActive             Boolean       @default(true)
+  lastFetchedAt        DateTime?
+  fetchIntervalMinutes Int           @default(15)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  storySources         StorySource[]
+}
+
+model Story {
+  id                 String        @id @default(cuid())
+  title              String
+  slug               String        @unique
+  rawTitle           String?
+  summary            String
+  content            String
+  sourceName         String
+  sourceUrl          String
+  imageUrl           String?
+  category           String        // global, india, student, exams, live, trending
+  subCategory        String?       // world, usa, politics, economy, education, etc.
+  isBreaking         Boolean       @default(false)
+  isFeatured         Boolean       @default(false)
+  isLive             Boolean       @default(false)
+  isTrending         Boolean       @default(false)
+  verificationStatus String        @default("HIGH_CONFIDENCE") // VERIFIED_OFFICIAL, HIGH_CONFIDENCE, MULTIPLE_SOURCES, UNVERIFIED_SINGLE_SOURCE
+  verificationScore  Float         @default(0.85)
+  clusterId          String?
+  readCount          Int           @default(0)
+  isDemoData         Boolean       @default(false)
+  publishedAt        DateTime      @default(now())
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  sources            StorySource[]
+  liveUpdates        LiveUpdate[]
+}
+
+model StorySource {
+  id          String   @id @default(cuid())
+  storyId     String
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  feedId      String?
+  feed        Feed?    @relation(fields: [feedId], references: [id], onDelete: SetNull)
+  sourceName  String
+  url         String
+  publishedAt DateTime @default(now())
+}
+
+model LiveUpdate {
+  id          String   @id @default(cuid())
+  storyId     String
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  title       String
+  body        String
+  publishedAt DateTime @default(now())
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  type      String   // INGESTION, AI_PROCESSING, CLUSTER, ERROR, BROADCAST
+  message   String
+  details   String?
+  createdAt DateTime @default(now())
+}
